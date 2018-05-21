@@ -1,0 +1,4 @@
+C:\Users\UZER\Documents\Projects\task2\task2\bin\Debug\task2.exe
+C:\Users\UZER\Documents\Projects\task2\task2\bin\Debug\task2.pdb
+C:\Users\UZER\Documents\Projects\task2\task2\obj\x86\Debug\task2.exe
+C:\Users\UZER\Documents\Projects\task2\task2\obj\x86\Debug\task2.pdb
