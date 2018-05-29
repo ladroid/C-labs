@@ -119,21 +119,49 @@ namespace task1
 		{
 			Console.WriteLine ("Hello World!");
 
-			const int w = 5;
+			Console.WriteLine ("Enter h");
+			int num = Convert.ToInt32(Console.ReadLine());
+			Console.WriteLine (num);
+
+			Console.WriteLine ("Enter w");
+			int num2 = Convert.ToInt32(Console.ReadLine());
+			Console.WriteLine (num2);
+
+			Console.WriteLine ("Enter array");
+
+			int[,] matrix1 = new int[2, 2];
+
+			int[,] data = new int[num, num2];
+			for (int i = 0; i < num; i++) {
+				for (int j = 0; j < num2; j++) {
+					data [i, j] = Int32.Parse(Console.ReadLine());
+				}
+			}
+
+			Console.WriteLine ("Output");
+			for (int i = 0; i < num; i++) {
+				for (int j = 0; j < num2; j++) {
+					Console.Write(data[i, j] + " ");
+				}
+				Console.WriteLine ();
+			}
+
+			/*const int w = 5;
 			const int h = 4;
+
 
 
 			int[,] data = new int[h,w]{
 				{0,0,0,1,0},
 				{0,0,0,1,0},
 				{0,0,1,1,0},
-				{0,0,0,0,0}};
+				{0,0,0,0,0}};*/
 				/*{0,0,0,0,1},
 				{0,0,0,1,0},
 				{0,0,1,0,0},
 				{0,1,0,0,0}};*/
 
-			Map map = new Map(data,w,h);
+			Map map = new Map(data,num2,num);
 
 			List<Node> longest = map.longestPath();
 			Console.WriteLine("LONGEST " + longest.Count + " ");
@@ -144,9 +172,9 @@ namespace task1
 				data[n.r,n.c] = c--;
 
 			string st = " ";
-			for(int i = 0; i < h; i++ )
+			for(int i = 0; i < num; i++ )
 			{
-				for(int j = 0; j < w; j++)
+				for(int j = 0; j < num2; j++)
 				{
 					st += data[i,j] + ", ";
 				}
