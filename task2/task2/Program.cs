@@ -1,4 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Printing;
+using System.Collections;
+using System.Printing.IndexedProperties;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace task2
 {
@@ -11,6 +19,8 @@ namespace task2
 			Triangle tr1 = new Triangle ("Triangle", 18, 18, 36, 12, 23);
 			Triangle tr2 = new Triangle ("Triangle", 18, 18, 36, 12, 23);
 
+			Triangle tr3 = new Triangle ("Triangle22", 23, 22, 36, 12, 20);
+
 			Triangle[] arr = { tr, tr1, tr2 };
 			Picture pic = new Picture (arr);
 			pic.SumAllAreas ();
@@ -19,16 +29,27 @@ namespace task2
 			tr.CallTriangles ();
 			tr.Perimeter ();
 			tr.GetArea ();
+			Console.WriteLine (tr.Equals (tr1));
+			//Console.WriteLine(tr.ToString ());
+			Console.WriteLine ("tr");
+			Console.WriteLine(tr.GetArea ());
+			tr3 = tr1.DeepCopy ();
+			Console.WriteLine ("tr3");
+			Console.WriteLine(tr3.GetArea ());
+			Console.WriteLine ("Next");
+			Console.WriteLine (tr1.GetHashCode ());
+			Console.WriteLine (tr3.GetHashCode ());
 		}
 	}
 
-	interface IShape
+	abstract class IShape
 	{
-		string GetName(string Name);
-		double GetArea();
+		abstract public string GetName(string Name);
+		abstract public double GetArea();
 	}
 
-	public class Triangle : IShape 
+	[Serializable]
+	class Triangle : IShape 
 	{
 		protected double side;
 		protected double side2;
@@ -37,6 +58,9 @@ namespace task2
 		protected double radian;
 		protected string name;
 		protected double Area;
+
+		public Triangle() {
+		}
 
 		public Triangle(string name, double side, double side2, double side3, double height, double radian)
 		{
@@ -93,11 +117,11 @@ namespace task2
 				Console.WriteLine (GetArea ());
 			}
 		}
-		public virtual string GetName(string Name)
+		public override string GetName(string Name)
 		{
 			return "Shape: " + Name;
 		}
-		public double GetArea()
+		public override double GetArea()
 		{
 			double area = (side * height) / 2;
 			return area;
@@ -112,9 +136,70 @@ namespace task2
 			Area += GetArea ();
 			return Area;
 		}
+
+		public override bool Equals (object obj)
+		{
+			if (obj == null || GetType () != obj.GetType ()) {
+				return false;
+			}
+			Triangle tr = (Triangle)obj;
+			return (side == tr.side) && (side2 == tr.side2) && (side3 == tr.side3);
+		}
+
+		public override int GetHashCode ()
+		{
+			int res = 0;
+			if (this.GetType ().Name == "Triangle") {
+				res = ((int)side ^ (int)side2 ^ (int)side3);
+			}
+			return res; 
+			//return base.GetHashCode ();
+		}
+
+		public override string ToString ()
+		{
+			Type type = typeof(Triangle);
+			FieldInfo[] fields = type.GetFields (BindingFlags.Public);
+			Console.WriteLine ("Displaying the values of the fields of {0}:", type);
+			Triangle tr = new Triangle ();
+			String res = "";
+			for (int i = 0; i < fields.Length; i++) {
+				//Console.WriteLine("{0}:\t'{1}'", fields[i].Name, fields[i].GetValue(tr));
+				res = "{0}:\t'{1}'" + fields[i].Name + fields[i].GetValue(tr);
+			}
+
+			MethodInfo[] methodinfo = type.GetMethods ();
+			String mm = "";
+			foreach (MethodInfo temp in methodinfo) 
+			{
+				mm = temp.Name;
+			}
+			String r = "Class is " + type.Name + 
+				"\n" + "Methods are " + mm;
+			return res + "\n" + r;
+		}
+
+		public Triangle DeepCopy() 
+		{
+			return (Triangle)this.MemberwiseClone ();
+		}
+
+		public static bool operator==(Triangle tr1, Triangle tr2) 
+		{
+			if (tr1.Equals (tr2))
+				return true;
+			return false;
+		}
+
+		public static bool operator!=(Triangle tr1, Triangle tr2) 
+		{
+			if (tr1.Equals (tr2))
+				return false;
+			return true;
+		}
 	}
 
-	public class IsoscalesTriangle : Triangle
+	class IsoscalesTriangle : Triangle
 	{
 		public IsoscalesTriangle(string name, double side, double side2, double side3, double height, double radian) : 
 		base(name, side, side2, side3, height, radian) 
@@ -133,7 +218,7 @@ namespace task2
 		}
 	}
 
-	public class EquilateralTriangle : Triangle
+	class EquilateralTriangle : Triangle
 	{
 		public EquilateralTriangle(string name, double side, double side2, double side3, double height, double radian) : 
 		base(name, side, side2, side3, height, radian) 
@@ -152,7 +237,7 @@ namespace task2
 		}
 	}
 
-	public class RightTriangle : Triangle
+	class RightTriangle : Triangle
 	{
 		public RightTriangle(string name, double side, double side2, double side3, double height, double radian) : 
 		base(name, side, side2, side3, height, radian) 
@@ -171,7 +256,7 @@ namespace task2
 		}
 	}
 
-	public class Picture
+	class Picture
 	{
 		private Triangle[] tring;
 		private double tr;
@@ -196,4 +281,88 @@ namespace task2
 			Console.WriteLine (tr);
 		}
 	}
+}
+
+public class StackOverflowException : Exception
+{
+	public StackOverflowException() : base("Your stack is overflow!") {}
+	public StackOverflowException(string message, Exception inner) : base(message, inner) {}
+	protected StackOverflowException(System.Runtime.Serialization.SerializationInfo info,
+		System.Runtime.Serialization.StreamingContext context) {}
+}
+
+public class DivideByZeroException : Exception
+{
+	public DivideByZeroException() : base("Division by zero!") {}
+
+	public DivideByZeroException(string message)
+		: base(message)
+	{
+	}
+
+	public DivideByZeroException(string message, Exception inner) : base(message, inner) {}
+
+	protected DivideByZeroException(System.Runtime.Serialization.SerializationInfo info,
+		System.Runtime.Serialization.StreamingContext context) {}
+}
+
+public class ArrayTypeMismatchException : Exception
+{
+	public ArrayTypeMismatchException() : base("The array has another type!") {}
+
+	public ArrayTypeMismatchException(string message) : base(message) {}
+
+	public ArrayTypeMismatchException(string message, Exception inner) : base(message, inner) {}
+
+	protected ArrayTypeMismatchException(System.Runtime.Serialization.SerializationInfo info,
+		System.Runtime.Serialization.StreamingContext context) {}
+}
+
+public class IndexOutOfRangeException : Exception
+{
+	public IndexOutOfRangeException() : base("Out of range!") {}
+
+	public IndexOutOfRangeException(string message) : base(message) {}
+
+	public IndexOutOfRangeException(string message, Exception inner) : base(message, inner) {}
+
+	protected IndexOutOfRangeException(System.Runtime.Serialization.SerializationInfo info,
+		System.Runtime.Serialization.StreamingContext context) {}
+}
+	
+public class InvalidCastException : Exception
+{
+	public InvalidCastException() : base("Invalid cast!") {}
+
+	public InvalidCastException(string message) : base(message) {}
+
+	public InvalidCastException(string message, Exception inner) : base(message, inner) {}
+
+	protected InvalidCastException(System.Runtime.Serialization.SerializationInfo info,
+		System.Runtime.Serialization.StreamingContext context) {}
+}
+
+
+public class OutOfMemoryException : Exception
+{
+	public OutOfMemoryException() : base("Out of memmory!") {}
+
+	public OutOfMemoryException(string message) : base(message) {}
+
+	public OutOfMemoryException(string message, Exception inner) : base(message, inner) {}
+
+	protected OutOfMemoryException(System.Runtime.Serialization.SerializationInfo info,
+		System.Runtime.Serialization.StreamingContext context) { }
+}
+	
+public class OverflowException : Exception
+{
+	public OverflowException() : base("Overflow!") {}
+
+	public OverflowException(string message) : base(message) {}
+
+	public OverflowException(string message, Exception inner) : base(message, inner) {}
+
+	protected OverflowException(System.Runtime.Serialization.SerializationInfo info,
+		System.Runtime.Serialization.StreamingContext context) {}
 }
