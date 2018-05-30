@@ -280,6 +280,33 @@ namespace task2
 			}
 			Console.WriteLine (tr);
 		}
+		public void AddElement(Triangle newTr) 
+		{
+			Triangle[] tr = new Triangle[tring.Length + 1];
+			Array.Copy (tring, tr, tring.Length);
+			tr [tring.Length] = newTr;
+			tring = tr;
+			Console.WriteLine ("Added new element -> ", newTr.GetType ().Name);
+		}
+		public void RemoveAt(int indexer) 
+		{
+			if (indexer < 0 || indexer > tring.Length - 1) 
+			{
+				throw new Exception ("Out of rangre!");
+			}
+			string elemName = tring [tring.Length - 1].GetType ().Name;
+			Triangle[] tr = new Triangle[tring.Length - 1];
+			if (indexer > 0) 
+			{
+				Array.Copy (tring, 0, tr, 0, indexer);
+			}
+			if (indexer < tring.Length - 1) 
+			{
+				Array.Copy (tring, indexer + 1, tr, indexer, tring.Length - indexer - 1);
+			}
+			tring = tr;
+			Console.WriteLine ("Delete element -> ", elemName);
+		}
 	}
 }
 
